@@ -1,0 +1,41 @@
+{
+  "name": "bet-pro-ai",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx server.ts",
+    "build": "ng build",
+    "lint": "ng lint",
+    "preview": "ng serve --configuration=production"
+  },
+  "dependencies": {
+    "@angular/build": "^21.1.0",
+    "@angular/cli": "^21.1.0",
+    "@angular/common": "^21.1.0",
+    "@angular/compiler": "^21.1.0",
+    "@angular/compiler-cli": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.4",
+    "@angular/platform-browser": "^21.1.0",
+    "@google/genai": "^1.41.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "node-cache": "^5.1.2",
+    "rxjs": "^7.8.2",
+    "tailwindcss": "latest",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.12",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.6",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

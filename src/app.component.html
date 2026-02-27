@@ -1,0 +1,1156 @@
+@if (!licenseService.isValid()) {
+<div class="fixed inset-0 z-[9999] bg-[#020617] flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1635326444826-06c8f8427912?q=80&w=2532&auto=format&fit=crop')] bg-cover bg-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    
+    <div class="relative z-10 w-full max-w-md bg-slate-900/90 border border-slate-700 rounded-2xl p-8 shadow-2xl shadow-blue-900/20">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-blue-600/20 text-blue-500 mb-4 border border-blue-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-white font-orbitron tracking-wide mb-2">BET PRO <span class="text-blue-500">AI</span></h1>
+            <p class="text-slate-400 text-sm">Zadajte licenčný kľúč pre prístup</p>
+        </div>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Licenčný Kľúč (Whop)</label>
+                <input 
+                    type="text" 
+                    [(ngModel)]="loginKey" 
+                    (keyup.enter)="handleLogin()"
+                    placeholder="WHOP-XXXX-XXXX-XXXX"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono text-center tracking-widest"
+                >
+            </div>
+
+            @if (loginError()) {
+                <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-3 text-red-400 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    {{ loginError() }}
+                </div>
+            }
+
+            <button 
+                (click)="handleLogin()" 
+                [disabled]="isLoggingIn() || !loginKey()"
+                class="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
+            >
+                @if (isLoggingIn()) {
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    OVERUJEM...
+                } @else {
+                    VSTÚPIŤ DO APLIKÁCIE
+                }
+            </button>
+            
+            <div class="text-center">
+                <a href="#" class="text-xs text-slate-500 hover:text-blue-400 transition-colors">Nemáte kľúč? Zakúpiť licenciu</a>
+            </div>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-slate-800 text-center">
+            <p class="text-[10px] text-slate-600 uppercase tracking-widest">Powered by Whop & Gemini AI</p>
+        </div>
+    </div>
+</div>
+}
+
+@if (licenseService.isValid()) {
+<div class="flex h-screen overflow-hidden bg-[#020617] text-slate-300 font-sans relative">
+  <div class="cyber-grid"></div>
+  
+    <!-- Sidebar (Desktop) -->
+    <aside class="hidden md:flex w-64 flex-col border-r border-slate-800 bg-[#0f172a]/80 backdrop-blur-md p-4 z-10">
+      <div class="mb-8 px-2 flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+           <!-- Lightning Icon -->
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-wide font-orbitron neon-text-blue flex items-center gap-2">
+              BET PRO
+              <span class="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[9px] font-bold text-blue-400 align-middle">BETA</span>
+          </h1>
+        </div>
+      </div>
+
+      <nav class="flex-1 space-y-2">
+        <button 
+          (click)="setView('dashboard')"
+          [class.bg-slate-800]="currentView() === 'dashboard'"
+          [class.text-white]="currentView() === 'dashboard'"
+          [class.neon-border-blue]="currentView() === 'dashboard'"
+          [class.text-slate-400]="currentView() !== 'dashboard'"
+          class="w-full flex items-center gap-3 p-3 rounded-lg transition-all text-sm font-medium text-left hover:bg-slate-800/50 hover:text-white border border-transparent"
+        >
+          <!-- Layout Grid Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          <span>Prehľad</span>
+        </button>
+
+         <button 
+          (click)="setView('ticket-dna')"
+          [class.bg-slate-800]="currentView() === 'ticket-dna'"
+          [class.text-white]="currentView() === 'ticket-dna'"
+          [class.neon-border-blue]="currentView() === 'ticket-dna'"
+          [class.text-slate-400]="currentView() !== 'ticket-dna'"
+          class="w-full flex items-center gap-3 p-3 rounded-lg transition-all text-sm font-medium text-left hover:bg-slate-800/50 hover:text-white border border-transparent"
+        >
+          <!-- Flame Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.12.8-2.22 1.5-3.2.5 2.5 2 4.9 4 6.5z"/></svg>
+          <span>Tiket Dňa</span>
+        </button>
+
+        <button 
+          (click)="setView('analysis')"
+          [class.bg-slate-800]="currentView() === 'analysis'"
+          [class.text-white]="currentView() === 'analysis'"
+          [class.neon-border-blue]="currentView() === 'analysis'"
+          [class.text-slate-400]="currentView() !== 'analysis'"
+          class="w-full flex items-center gap-3 p-3 rounded-lg transition-all text-sm font-medium text-left hover:bg-slate-800/50 hover:text-white border border-transparent"
+        >
+          <!-- Bar Chart Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
+          <span>Analýza Zápasov</span>
+        </button>
+
+        <button 
+          (click)="setView('generator')"
+          [class.bg-slate-800]="currentView() === 'generator'"
+          [class.text-white]="currentView() === 'generator'"
+          [class.neon-border-blue]="currentView() === 'generator'"
+          [class.text-slate-400]="currentView() !== 'generator'"
+          class="w-full flex items-center gap-3 p-3 rounded-lg transition-all text-sm font-medium text-left hover:bg-slate-800/50 hover:text-white border border-transparent"
+        >
+          <!-- CPU Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+          <span>AI Tactical Engine</span>
+        </button>
+
+        <button 
+          (click)="setView('my-bets')"
+          [class.bg-slate-800]="currentView() === 'my-bets'"
+          [class.text-white]="currentView() === 'my-bets'"
+          [class.neon-border-blue]="currentView() === 'my-bets'"
+          [class.text-slate-400]="currentView() !== 'my-bets'"
+          class="w-full flex items-center justify-between p-3 rounded-lg transition-all text-sm font-medium text-left hover:bg-slate-800/50 hover:text-white border border-transparent"
+        >
+          <div class="flex items-center gap-3">
+            <!-- Ticket Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V5.2A1.2 1.2 0 0 1 3.2 4h17.6A1.2 1.2 0 0 1 22 5.2V9"/><path d="M2 15v3.8a1.2 1.2 0 0 0 1.2 1.2h17.6a1.2 1.2 0 0 0 1.2-1.2V15"/><rect width="20" height="6" x="2" y="9" rx="2"/></svg>
+            <span>Moje Tikety</span>
+          </div>
+          @if (bankroll.activeBets().length > 0) {
+            <span class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
+              {{ bankroll.activeBets().length }}
+            </span>
+          }
+        </button>
+      </nav>
+
+      <!-- License / Pro Status -->
+      <div class="mt-auto pt-4 border-t border-slate-800 space-y-3">
+          <button (click)="openSettings()" class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition-colors text-xs font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              Nastavenia & Reset
+          </button>
+          
+          <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 flex items-center gap-3">
+              <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <div>
+                  <div class="text-xs font-bold text-emerald-400 tracking-wider">PRO ACTIVE</div>
+              </div>
+          </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto relative bg-transparent p-4 md:p-8 pb-32 md:pb-8 z-10">
+      
+      <!-- SOCIAL PROOF TICKER -->
+      <div class="mb-6 overflow-hidden bg-slate-900/50 border-y border-slate-800/50 py-1.5 flex items-center">
+          <div class="flex animate-marquee whitespace-nowrap gap-8 text-[10px] font-mono text-slate-400">
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>User_882 just won €124.50 (3-fold ACCA)</span>
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>New Analysis: Real Madrid vs Barcelona (High Confidence)</span>
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Alex_K just joined PRO</span>
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>User_991 just won €540.00 (High Risk Strategy)</span>
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>AI Engine calibrated for Premier League</span>
+              <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Stefan_S just won €89.20</span>
+          </div>
+      </div>
+
+      <!-- Header Mobile -->
+      <div class="md:hidden flex items-center justify-between p-4 mb-4 bg-[#0f172a]/90 backdrop-blur-md rounded-xl border border-slate-800 shadow-md neon-box-blue">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white shadow-[0_0_10px_rgba(37,99,235,0.5)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div>
+              <span class="font-bold text-white tracking-wide font-orbitron neon-text-blue block leading-none">BET PRO</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-800/50 px-3 py-1 rounded-full border border-slate-700/50">
+            @if(dataService.isOfflineMode()) {
+                <div class="flex items-center gap-1.5 px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 rounded mr-2" title="Offline Mode: Using simulated data">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold text-rose-400 uppercase">OFFLINE</span>
+                </div>
+            }
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span class="font-mono text-white text-[10px] font-bold opacity-50 mr-1">SIM</span>
+            <span class="font-mono text-white text-sm font-bold neon-text-emerald">€{{ bankroll.balance() | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Views -->
+      <div class="max-w-7xl mx-auto">
+        
+        @switch (currentView()) {
+          @case ('dashboard') {
+            <div class="space-y-6 animate-fade-in">
+              
+              <!-- 1. Stats Grid -->
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  
+                  <!-- Main Equity Card -->
+                  <div class="lg:col-span-2 bg-[#0f172a]/80 backdrop-blur-sm rounded-xl p-6 border border-slate-800 shadow-lg relative overflow-hidden group neon-box-blue">
+                     <!-- Subtle background effects -->
+                     <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-all duration-1000"></div>
+
+                     <div class="flex justify-between items-start mb-4">
+                         <div class="w-full">
+                             <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1 flex items-center gap-2 font-orbitron">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                 Total Equity (Simulovaný)
+                             </h3>
+                             
+                             <!-- Editable Balance -->
+                             @if (isEditingBalance()) {
+                                 <div class="flex items-center gap-2">
+                                     <span class="text-3xl text-slate-500 font-mono">€</span>
+                                     <input 
+                                         #balanceInput
+                                         type="number" 
+                                         [ngModel]="tempBalanceValue()" 
+                                         (ngModelChange)="tempBalanceValue.set(+$event)"
+                                         (blur)="saveBalance()"
+                                         (keyup.enter)="saveBalance()"
+                                         class="bg-slate-800 text-white text-4xl font-bold font-mono border border-blue-500 rounded px-2 py-1 w-full max-w-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                     >
+                                 </div>
+                             } @else {
+                                 <div class="flex items-baseline gap-3 cursor-pointer select-none group/balance" (click)="startEditingBalance()" title="Kliknite pre úpravu kapitálu">
+                                     <span class="text-5xl font-bold text-white tracking-tight font-mono group-hover/balance:text-blue-400 transition-colors neon-text-blue">€{{ bankroll.balance() | number:'1.2-2' }}</span>
+                                     <span class="text-xs font-bold px-1.5 py-0.5 rounded border"
+                                           [class.text-emerald-400]="bankroll.growthPercentage() >= 0"
+                                           [class.neon-text-emerald]="bankroll.growthPercentage() >= 0"
+                                           [class.border-emerald-500/30]="bankroll.growthPercentage() >= 0"
+                                           [class.bg-emerald-500/5]="bankroll.growthPercentage() >= 0"
+                                           [class.text-rose-400]="bankroll.growthPercentage() < 0"
+                                           [class.border-rose-500/30]="bankroll.growthPercentage() < 0"
+                                           [class.bg-rose-500/5]="bankroll.growthPercentage() < 0">
+                                         {{ bankroll.growthPercentage() > 0 ? '+' : ''}}{{ bankroll.growthPercentage() | number:'1.2-2' }}%
+                                     </span>
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-600 opacity-0 group-hover/balance:opacity-100 transition-opacity"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                                 </div>
+                             }
+                         </div>
+                     </div>
+
+                     <div class="grid grid-cols-3 gap-8 pt-4 border-t border-slate-800/50">
+                         <div (click)="startEditingBalance()" class="cursor-pointer group/item">
+                             <div class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1 group-hover/item:text-blue-400 transition-colors">Available Capital</div>
+                             <div class="text-slate-200 font-mono text-sm">€{{ (bankroll.balance()) | number:'1.2-2' }}</div>
+                         </div>
+                         <div>
+                             <div class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Active Exposure</div>
+                             <div class="text-blue-400 font-mono text-sm">€{{ activeExposure() | number:'1.2-2' }}</div>
+                         </div>
+                         <div>
+                             <div class="text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Net P/L</div>
+                             <div class="font-mono text-sm" [class.text-emerald-400]="bankroll.totalProfit() >= 0" [class.text-rose-400]="bankroll.totalProfit() < 0">
+                                 {{ bankroll.totalProfit() > 0 ? '+' : '' }}€{{ bankroll.totalProfit() | number:'1.2-2' }}
+                             </div>
+                         </div>
+                     </div>
+                  </div>
+
+                  <!-- Win Rate / ROI Widget -->
+                  <div class="bg-[#0f172a]/80 backdrop-blur-sm rounded-xl p-6 border border-slate-800 shadow-lg flex flex-col justify-between neon-box-blue">
+                       <div>
+                         <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-4 flex items-center gap-2 font-orbitron">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            Performance (Win Rate)
+                         </h3>
+                         <div class="flex items-center gap-4 mb-4">
+                             <!-- Dynamic Win Rate Circle -->
+                             <div class="relative w-16 h-16 flex items-center justify-center">
+                                 <svg class="w-full h-full transform -rotate-90">
+                                     <circle cx="32" cy="32" r="28" stroke="#1e293b" stroke-width="6" fill="none"/>
+                                     <!-- Circumference approx 175. Stroke-dashoffset = 175 - (175 * percent / 100) -->
+                                     <circle cx="32" cy="32" r="28" 
+                                             [attr.stroke]="performanceStats().winRate >= 50 ? '#10b981' : '#f43f5e'"
+                                             stroke-width="6" fill="none" 
+                                             stroke-dasharray="175" 
+                                             [attr.stroke-dashoffset]="175 - (175 * performanceStats().winRate / 100)"
+                                             class="transition-all duration-1000"/>
+                                 </svg>
+                                 <span class="absolute text-white font-bold text-sm">{{ performanceStats().winRate | number:'1.0-0' }}%</span>
+                             </div>
+                             <div class="flex-1">
+                                 <div class="text-white text-sm font-medium mb-1">ROI: 
+                                    <span [class.text-emerald-400]="performanceStats().roi >= 0" [class.text-rose-400]="performanceStats().roi < 0">
+                                        {{ performanceStats().roi > 0 ? '+' : ''}}{{ performanceStats().roi | number:'1.1-1' }}%
+                                    </span>
+                                 </div>
+                                 <p class="text-xs text-slate-500 leading-snug" *ngIf="performanceStats().winRate > 55">Výborná forma! Udržuj disciplínu.</p>
+                                 <p class="text-xs text-slate-500 leading-snug" *ngIf="performanceStats().winRate <= 55">Analyzuj prehraté tikety v histórii.</p>
+                             </div>
+                         </div>
+                       </div>
+                       <button (click)="setView('ticket-dna')" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3 rounded-lg transition-colors border border-slate-700 flex items-center justify-center gap-2">
+                           NÁJSŤ HODNOTU
+                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                       </button>
+                  </div>
+              </div>
+
+              <!-- 2. Profit Graph -->
+              <div class="bg-[#0f172a]/80 backdrop-blur-sm rounded-xl p-6 border border-slate-800 shadow-lg neon-box-blue">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2">
+                         <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]"></div>
+                         <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest font-orbitron">Performance Analytics</h3>
+                    </div>
+                    <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-800">
+                        <button (click)="setGraphTimeframe('7d')" 
+                            class="px-3 py-1 text-[10px] font-bold rounded transition-colors"
+                            [class.bg-slate-800]="graphTimeframe() === '7d'"
+                            [class.text-white]="graphTimeframe() === '7d'"
+                            [class.border]="graphTimeframe() === '7d'"
+                            [class.border-slate-700]="graphTimeframe() === '7d'"
+                            [class.shadow-sm]="graphTimeframe() === '7d'"
+                            [class.text-slate-500]="graphTimeframe() !== '7d'">7D</button>
+                        <button (click)="setGraphTimeframe('30d')"
+                            class="px-3 py-1 text-[10px] font-bold rounded transition-colors"
+                            [class.bg-slate-800]="graphTimeframe() === '30d'"
+                            [class.text-white]="graphTimeframe() === '30d'"
+                            [class.border]="graphTimeframe() === '30d'"
+                            [class.border-slate-700]="graphTimeframe() === '30d'"
+                            [class.shadow-sm]="graphTimeframe() === '30d'"
+                            [class.text-slate-500]="graphTimeframe() !== '30d'">30D</button>
+                        <button (click)="setGraphTimeframe('ytd')"
+                            class="px-3 py-1 text-[10px] font-bold rounded transition-colors"
+                            [class.bg-slate-800]="graphTimeframe() === 'ytd'"
+                            [class.text-white]="graphTimeframe() === 'ytd'"
+                            [class.border]="graphTimeframe() === 'ytd'"
+                            [class.border-slate-700]="graphTimeframe() === 'ytd'"
+                            [class.shadow-sm]="graphTimeframe() === 'ytd'"
+                            [class.text-slate-500]="graphTimeframe() !== 'ytd'">YTD</button>
+                    </div>
+                </div>
+                <app-sparkline [data]="chartData()" [labels]="chartLabels()"></app-sparkline>
+              </div>
+
+              <!-- 3. Transaction Terminal -->
+              <div class="bg-[#0f172a]/80 backdrop-blur-sm rounded-xl border border-slate-800 shadow-lg overflow-hidden neon-box-blue">
+                  <div class="px-6 py-4 border-b border-slate-800 flex flex-col md:flex-row justify-between items-center bg-slate-900/50 gap-4">
+                      <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 font-orbitron">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                          Transaction Ledger
+                      </h3>
+                      
+                      <div class="flex items-center gap-4 w-full md:w-auto justify-between">
+                          <!-- Filters -->
+                          <div class="flex bg-[#020617] p-0.5 rounded border border-slate-800">
+                              <button (click)="setLedgerFilter('ALL')" [class.bg-slate-800]="ledgerFilter() === 'ALL'" [class.text-white]="ledgerFilter() === 'ALL'" class="px-2 py-1 text-[10px] font-bold text-slate-500 rounded transition-colors">ALL</button>
+                              <button (click)="setLedgerFilter('WON')" [class.bg-emerald-900]="ledgerFilter() === 'WON'" [class.text-emerald-400]="ledgerFilter() === 'WON'" class="px-2 py-1 text-[10px] font-bold text-slate-500 rounded transition-colors">WIN</button>
+                              <button (click)="setLedgerFilter('LOST')" [class.bg-rose-900]="ledgerFilter() === 'LOST'" [class.text-rose-400]="ledgerFilter() === 'LOST'" class="px-2 py-1 text-[10px] font-bold text-slate-500 rounded transition-colors">LOSS</button>
+                              <button (click)="setLedgerFilter('PENDING')" [class.bg-yellow-900]="ledgerFilter() === 'PENDING'" [class.text-yellow-400]="ledgerFilter() === 'PENDING'" class="px-2 py-1 text-[10px] font-bold text-slate-500 rounded transition-colors">OPEN</button>
+                          </div>
+
+                          <!-- Pagination -->
+                          <div class="flex gap-2">
+                              <button (click)="prevPage()" [disabled]="!hasPrevPage()" class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed p-1 hover:bg-slate-800 rounded transition-colors">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                              </button>
+                              <span class="text-xs text-slate-500 font-mono self-center px-2">{{ ledgerPage() + 1 }}</span>
+                              <button (click)="nextPage()" [disabled]="!hasNextPage()" class="text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed p-1 hover:bg-slate-800 rounded transition-colors">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="overflow-x-auto">
+                      <table class="w-full text-left border-collapse">
+                          <thead>
+                              <tr class="text-[10px] text-slate-500 uppercase border-b border-slate-800">
+                                  <th class="px-6 py-3 font-semibold tracking-wider">Time</th>
+                                  <th class="px-6 py-3 font-semibold tracking-wider">Instrument</th>
+                                  <th class="px-6 py-3 font-semibold tracking-wider">Position</th>
+                                  <th class="px-6 py-3 font-semibold tracking-wider text-right">Stake</th>
+                                  <th class="px-6 py-3 font-semibold tracking-wider text-right">Return</th>
+                                  <th class="px-6 py-3 font-semibold tracking-wider text-center">State</th>
+                              </tr>
+                          </thead>
+                          <tbody class="text-sm">
+                              @if(paginatedLedger().length === 0) {
+                                  <tr><td colspan="6" class="px-6 py-12 text-center text-slate-500 text-xs italic">No trade history available.</td></tr>
+                              }
+                              @for(bet of paginatedLedger(); track bet.id) {
+                                  <tr class="border-b border-slate-800/50 hover:bg-slate-800/40 transition-colors group">
+                                      <td class="px-6 py-3 text-slate-400 font-mono text-xs whitespace-nowrap">{{ bet.timestamp | date:'dd MMM HH:mm' }}</td>
+                                      <td class="px-6 py-3 text-slate-200 font-medium whitespace-nowrap">{{ bet.match }}</td>
+                                      <td class="px-6 py-3">
+                                          <span class="text-xs text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700/50">
+                                              {{ bet.selection }} <span class="text-slate-600 px-1">|</span> {{ bet.odds.toFixed(2) }}
+                                          </span>
+                                      </td>
+                                      <td class="px-6 py-3 text-right text-slate-300 font-mono text-xs">€{{ bet.stake | number:'1.2-2' }}</td>
+                                      <td class="px-6 py-3 text-right font-mono font-bold text-xs" 
+                                          [class.text-emerald-400]="bet.status === 'won'" 
+                                          [class.text-rose-400]="bet.status === 'lost'"
+                                          [class.text-yellow-500]="bet.status === 'pending'">
+                                          @if(bet.status === 'pending') {
+                                              ...
+                                          } @else {
+                                              {{ bet.status === 'won' ? '+' : '' }}€{{ bet.status === 'won' ? (bet.stake * bet.odds - bet.stake | number:'1.2-2') : bet.stake | number:'1.2-2' }}
+                                          }
+                                      </td>
+                                      <td class="px-6 py-3 text-center">
+                                          <span class="w-2 h-2 rounded-full inline-block" 
+                                              [class.bg-emerald-500]="bet.status === 'won'"
+                                              [class.bg-rose-500]="bet.status === 'lost'"
+                                              [class.bg-yellow-500]="bet.status === 'pending'"
+                                              [class.animate-pulse]="bet.status === 'pending'"
+                                              [class.shadow-[0_0_8px_rgba(16,185,129,0.5)]]="bet.status === 'won'"
+                                              [class.shadow-[0_0_8px_rgba(244,63,94,0.5)]]="bet.status === 'lost'">
+                                          </span>
+                                      </td>
+                                  </tr>
+                              }
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+
+            </div>
+          }
+
+          @case ('ticket-dna') {
+            <div class="animate-fade-in max-w-3xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-white mb-2 flex items-center justify-center gap-3 font-orbitron neon-text-blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.12.8-2.22 1.5-3.2.5 2.5 2 4.9 4 6.5z"/></svg>
+                        Tiket Dňa
+                    </h2>
+                    <p class="text-slate-400 text-sm mb-4">Algoritmicky vybrané zápasy s najvyššou pravdepodobnosťou úspechu pre dnešný deň.</p>
+                    
+                    <!-- URGENCY TIMER -->
+                    <div class="inline-flex items-center gap-2 bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-full text-rose-400 text-xs font-bold animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        EXPIRES IN: {{ countdown() }}
+                    </div>
+                </div>
+
+                <div class="bg-[#1e293b]/90 backdrop-blur-md border border-slate-700 rounded-2xl overflow-hidden shadow-2xl relative neon-box-blue">
+                    <div class="absolute top-0 w-full h-1 bg-gradient-to-r from-blue-500 via-emerald-400 to-blue-500"></div>
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700">
+                             <div class="flex gap-2">
+                                <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded shadow-[0_0_10px_rgba(37,99,235,0.5)]">SAFE</span>
+                                <span class="bg-slate-700 text-slate-300 text-xs font-bold px-2 py-1 rounded">{{ dailyTicketPredictions().length }} TIPOV</span>
+                             </div>
+                             <div class="text-right">
+                                <div class="text-xs text-slate-500 uppercase font-bold">Celkový Kurz</div>
+                                <div class="text-2xl font-bold text-white neon-text-emerald">
+                                    {{ dailyTicketTotalOdds() | number:'1.2-2' }}
+                                </div>
+                             </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            @for(pred of dailyTicketPredictions(); track pred.id) {
+                                <div class="flex items-center justify-between bg-[#0f172a] p-4 rounded-xl border border-slate-800">
+                                    <div class="flex-1">
+                                        <div class="text-white font-bold text-sm">{{ pred.home }} <span class="text-slate-500 text-xs px-1">vs</span> {{ pred.away }}</div>
+                                        <div class="text-xs text-slate-500 mt-0.5 uppercase flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                                            {{ pred.marketName }}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded mb-1 border border-emerald-400/20">{{ pred.selectionName }}</span>
+                                        <span class="text-white font-bold">{{ pred.odds.toFixed(2) }}</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="bg-[#0f172a] p-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3 w-full sm:w-auto bg-[#020617] p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-500 font-bold uppercase pl-2">Vklad €</span>
+                            <input type="number" [ngModel]="currentStake()" (ngModelChange)="currentStake.set(+$event)" min="1" class="bg-transparent border-l border-slate-800 text-white text-sm w-20 p-1 font-bold focus:outline-none text-center">
+                        </div>
+                        <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                             <div class="text-right hidden sm:block">
+                                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Výhra</div>
+                                <div class="text-emerald-400 font-bold font-mono text-lg">€{{ (currentStake() * dailyTicketTotalOdds()) | number:'1.2-2' }}</div>
+                             </div>
+                             <button (click)="placeDailyTicket()" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-8 rounded-lg transition-colors shadow-lg shadow-blue-900/20 text-sm tracking-wide flex items-center justify-center gap-2">
+                                <span>VSAĎIŤ</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          }
+
+          @case ('analysis') {
+             <div class="animate-fade-in">
+                 <div class="flex justify-between items-center mb-6">
+                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>
+                         Analýza Zápasov
+                         <span class="ml-2 text-[10px] bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full uppercase tracking-widest font-bold" title="Kurzy a štatistiky sú simulované pre účely dema">Simulované Dáta</span>
+                     </h2>
+                     <div class="flex bg-[#1e293b] rounded-lg p-1 overflow-x-auto scrollbar-hide">
+                         @for (league of ['PL', 'PD', 'BL1', 'SA', 'L1', 'ERE', 'PPL', 'UCL', 'UEL']; track league) {
+                             <button (click)="setLeague($any(league))" class="px-3 md:px-4 py-1.5 rounded-md text-xs font-bold transition-all duration-200 whitespace-nowrap flex-shrink-0" [class.bg-blue-600]="selectedLeague() === league" [class.text-white]="selectedLeague() === league" [class.shadow-lg]="selectedLeague() === league" [class.text-slate-400]="selectedLeague() !== league" [class.hover:text-white]="selectedLeague() !== league">{{ league }}</button>
+                         }
+                     </div>
+                 </div>
+
+                 <div class="grid gap-8">
+                     @if (isLoadingMatches()) {
+                         <div class="flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
+                             <svg class="animate-spin h-10 w-10 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                             </svg>
+                             <span class="text-sm font-orbitron tracking-widest">GENERATING LIVE MATCH DATA (AI)...</span>
+                         </div>
+                     } @else if (matchesError()) {
+                         <div class="flex flex-col items-center justify-center py-20 text-slate-500">
+                             <div class="text-rose-500 mb-4">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                             </div>
+                             <h3 class="text-lg font-bold text-white mb-2">Chyba pri načítaní dát</h3>
+                             <p class="text-sm mb-6">Nepodarilo sa načítať live dáta. Skontrolujte pripojenie.</p>
+                             <button (click)="loadDynamicMatches()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                 SKÚSIŤ ZNOVA
+                             </button>
+                         </div>
+                     } @else if (matches().length === 0) {
+                         <div class="flex flex-col items-center justify-center py-20 text-slate-500">
+                             <div class="text-slate-600 mb-4">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
+                             </div>
+                             <h3 class="text-lg font-bold text-white mb-2">Žiadne zápasy</h3>
+                             <p class="text-sm">Pre vybranú ligu sa nenašli žiadne nadchádzajúce zápasy.</p>
+                         </div>
+                     } @else {
+                         @for (match of matches(); track match.id) {
+                             <div class="bg-[#0f172a]/80 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden shadow-xl hover:border-blue-500/50 transition-all duration-300 neon-box-blue group">
+                                <div (click)="toggleMatch(match)" class="p-6 cursor-pointer relative select-none">
+                                  <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                                     <div class="flex-1 w-full">
+                                       <div class="mb-4">
+                                          <div class="text-xl font-bold text-white tracking-wide font-orbitron group-hover:text-blue-400 transition-colors">{{ match.home }} <span class="text-slate-600 mx-2">vs</span> {{ match.away }}</div>
+                                          <div class="flex items-center gap-2 mt-2">
+                                              <span class="bg-blue-900/50 text-blue-200 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-500/20">{{ match.time }}</span>
+                                              <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{{ match.league }}</span>
+                                          </div>
+                                       </div>
+                                     </div>
+                                    <div class="flex flex-col md:items-end w-full md:w-auto mt-4 md:mt-0 gap-4">
+                                     <div class="flex gap-2 w-full">
+                                        <button (click)="placeBet(match, '1', match.odds.home, $event)" class="flex-1 md:w-24 bg-[#020617] border border-slate-800 rounded-lg p-2.5 hover:border-emerald-500 hover:bg-slate-900 transition-all group relative active:scale-95" [class.ring-2]="match.recommendedBet === '1'" [class.ring-yellow-500]="match.recommendedBet === '1'" [class.shadow-[0_0_15px_rgba(234,179,8,0.3)]]="match.recommendedBet === '1'"><div class="text-[10px] text-slate-500 text-center mb-1 group-hover:text-emerald-500">1</div><div class="text-emerald-500 font-bold text-lg text-center">{{ match.odds.home.toFixed(2) }}</div></button>
+                                        <button (click)="placeBet(match, 'X', match.odds.draw, $event)" class="flex-1 md:w-24 bg-[#020617] border border-slate-800 rounded-lg p-2.5 hover:border-emerald-500 hover:bg-slate-900 transition-all group relative active:scale-95" [class.ring-2]="match.recommendedBet === 'X'" [class.ring-yellow-500]="match.recommendedBet === 'X'" [class.shadow-[0_0_15px_rgba(234,179,8,0.3)]]="match.recommendedBet === 'X'"><div class="text-[10px] text-slate-500 text-center mb-1 group-hover:text-emerald-500">X</div><div class="text-white font-bold text-lg text-center">{{ match.odds.draw.toFixed(2) }}</div></button>
+                                        <button (click)="placeBet(match, '2', match.odds.away, $event)" class="flex-1 md:w-24 bg-[#020617] border border-slate-800 rounded-lg p-2.5 hover:border-emerald-500 hover:bg-slate-900 transition-all group relative active:scale-95" [class.ring-2]="match.recommendedBet === '2'" [class.ring-yellow-500]="match.recommendedBet === '2'" [class.shadow-[0_0_15px_rgba(234,179,8,0.3)]]="match.recommendedBet === '2'"><div class="text-[10px] text-slate-500 text-center mb-1 group-hover:text-emerald-500">2</div><div class="text-blue-400 font-bold text-lg text-center">{{ match.odds.away.toFixed(2) }}</div></button>
+                                     </div>
+                                 </div>
+                              </div>
+                            </div>
+                            @if(expandedMatchId() === match.id) {
+                                <div>
+                                    <div class="h-0.5 w-full bg-slate-800 relative"><div class="absolute left-0 top-0 h-full bg-emerald-500" style="width: 50%"></div><div class="absolute right-0 top-0 h-full bg-blue-500" style="width: 50%"></div></div>
+                                    <div class="bg-[#020617]/50 p-6 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 animate-fade-in">
+                                       
+                                       <!-- HOME TEAM STATS -->
+                                       <div>
+                                          <div class="flex items-center gap-2 mb-6 text-emerald-500 border-b border-slate-800 pb-2">
+                                             <span class="text-xs font-bold uppercase tracking-wider">{{ match.home }}</span>
+                                          </div>
+                                          
+                                          <div class="mb-6">
+                                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2">Všeobecné</div>
+                                            <div class="grid grid-cols-3 gap-y-4 text-center bg-[#0f172a] p-3 rounded-lg border border-slate-800">
+                                              <div><div class="text-[9px] text-slate-500">BODY</div><div class="text-white font-bold">{{ match.stats.home.points }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">SKÓRE</div><div class="text-white font-bold">{{ match.stats.home.goalsFor }}:{{ match.stats.home.goalsAgainst }}</div></div>
+                                              <div>
+                                                <div class="text-[9px] text-slate-500">FORMA</div>
+                                                <div class="flex justify-center gap-0.5 mt-1">@for (res of getFormArray(match.stats.home.form); track $index) {<div class="w-2 h-2 rounded-full" [ngClass]="getFormColor(res)"></div>}</div>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div class="mb-6">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Útok & Hra</span>
+                                                <span class="text-[9px] text-blue-400 font-bold bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/20">Ø NA ZÁPAS</span>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-y-4 text-center bg-[#0f172a] p-3 rounded-lg border border-slate-800">
+                                              <div><div class="text-[9px] text-slate-500">xG (Sim)</div><div class="text-blue-400 font-bold">{{ match.stats.home.xG }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">STRELY (CELK/BRÁ)</div><div class="text-white font-bold">{{ match.stats.home.shotsTotal }}/{{ match.stats.home.shotsOnTarget }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">ROHY</div><div class="text-white font-bold">{{ match.stats.home.corners }}</div></div>
+                                              
+                                              <div><div class="text-[9px] text-slate-500">DRŽANIE</div><div class="text-white font-bold">{{ match.stats.home.possession }}%</div></div>
+                                              <div><div class="text-[9px] text-slate-500">OFFSIDY</div><div class="text-white font-bold">{{ match.stats.home.offsides }}</div></div>
+                                            </div>
+                                          </div>
+
+                                          <div>
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Obrana & Disciplína</span>
+                                                <span class="text-[9px] text-blue-400 font-bold bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/20">Ø NA ZÁPAS</span>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-y-4 text-center bg-[#0f172a] p-3 rounded-lg border border-slate-800">
+                                              <div><div class="text-[9px] text-slate-500">CLEAN SHEETS</div><div class="text-emerald-400 font-bold">{{ match.stats.home.cleanSheets }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">ZÁKROKY BR.</div><div class="text-white font-bold">{{ match.stats.home.saves }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">FAULY</div><div class="text-white font-bold">{{ match.stats.home.fouls }}</div></div>
+                                              
+                                              <div><div class="text-[9px] text-slate-500">ŽLTÉ KARTY</div><div class="text-yellow-500 font-bold">{{ match.stats.home.yellowCards }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">ČERVENÉ KARTY</div><div class="text-rose-500 font-bold">{{ match.stats.home.redCards }}</div></div>
+                                            </div>
+                                          </div>
+
+                                          @if(match.stats.home.injuries.length > 0) {
+                                              <div class="text-xs mt-4 p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-center">
+                                                 <span class="text-rose-400 font-bold">Zranenia:</span> 
+                                                 <span class="text-slate-400 ml-1">{{ match.stats.home.injuries.join(', ') }}</span>
+                                              </div>
+                                          }
+                                       </div>
+
+                                       <!-- AWAY TEAM STATS -->
+                                       <div>
+                                          <div class="flex items-center gap-2 mb-6 text-blue-500 border-b border-slate-800 pb-2">
+                                             <span class="text-xs font-bold uppercase tracking-wider">{{ match.away }}</span>
+                                          </div>
+                                          
+                                          <div class="mb-6">
+                                            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-2">Všeobecné</div>
+                                            <div class="grid grid-cols-3 gap-y-4 text-center bg-[#0f172a] p-3 rounded-lg border border-slate-800">
+                                              <div><div class="text-[9px] text-slate-500">BODY</div><div class="text-white font-bold">{{ match.stats.away.points }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">SKÓRE</div><div class="text-white font-bold">{{ match.stats.away.goalsFor }}:{{ match.stats.away.goalsAgainst }}</div></div>
+                                              <div>
+                                                <div class="text-[9px] text-slate-500">FORMA</div>
+                                                <div class="flex justify-center gap-0.5 mt-1">@for (res of getFormArray(match.stats.away.form); track $index) {<div class="w-2 h-2 rounded-full" [ngClass]="getFormColor(res)"></div>}</div>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div class="mb-6">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Útok & Hra</span>
+                                                <span class="text-[9px] text-blue-400 font-bold bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/20">Ø NA ZÁPAS</span>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-y-4 text-center bg-[#0f172a] p-3 rounded-lg border border-slate-800">
+                                              <div><div class="text-[9px] text-slate-500">xG (Sim)</div><div class="text-blue-400 font-bold">{{ match.stats.away.xG }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">STRELY (CELK/BRÁ)</div><div class="text-white font-bold">{{ match.stats.away.shotsTotal }}/{{ match.stats.away.shotsOnTarget }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">ROHY</div><div class="text-white font-bold">{{ match.stats.away.corners }}</div></div>
+                                              
+                                              <div><div class="text-[9px] text-slate-500">DRŽANIE</div><div class="text-white font-bold">{{ match.stats.away.possession }}%</div></div>
+                                              <div><div class="text-[9px] text-slate-500">OFFSIDY</div><div class="text-white font-bold">{{ match.stats.away.offsides }}</div></div>
+                                            </div>
+                                          </div>
+
+                                          <div>
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Obrana & Disciplína</span>
+                                                <span class="text-[9px] text-blue-400 font-bold bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/20">Ø NA ZÁPAS</span>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-y-4 text-center bg-[#0f172a] p-3 rounded-lg border border-slate-800">
+                                              <div><div class="text-[9px] text-slate-500">CLEAN SHEETS</div><div class="text-emerald-400 font-bold">{{ match.stats.away.cleanSheets }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">ZÁKROKY BR.</div><div class="text-white font-bold">{{ match.stats.away.saves }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">FAULY</div><div class="text-white font-bold">{{ match.stats.away.fouls }}</div></div>
+                                              
+                                              <div><div class="text-[9px] text-slate-500">ŽLTÉ KARTY</div><div class="text-yellow-500 font-bold">{{ match.stats.away.yellowCards }}</div></div>
+                                              <div><div class="text-[9px] text-slate-500">ČERVENÉ KARTY</div><div class="text-rose-500 font-bold">{{ match.stats.away.redCards }}</div></div>
+                                            </div>
+                                          </div>
+
+                                          @if(match.stats.away.injuries.length > 0) {
+                                              <div class="text-xs mt-4 p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-center">
+                                                 <span class="text-rose-400 font-bold">Zranenia:</span> 
+                                                 <span class="text-slate-400 ml-1">{{ match.stats.away.injuries.join(', ') }}</span>
+                                              </div>
+                                          }
+                                       </div>
+
+                                    </div>
+                                    
+                                    <!-- Extended Betting Markets -->
+                                    <div class="px-6 pb-6 animate-fade-in">
+                                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Rozšírené Stávky</h4>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <button (click)="placeSpecificBet(match, 'Góly', 'Nad 2.5', match.odds.over25)" class="bg-[#0f172a] border border-slate-700 hover:border-blue-500 rounded p-3 text-center transition-colors">
+                                                <div class="text-xs text-slate-400 mb-1">Nad 2.5 Gólov</div>
+                                                <div class="font-bold text-blue-400">{{ match.odds.over25.toFixed(2) }}</div>
+                                            </button>
+                                            <button (click)="placeSpecificBet(match, 'Góly', 'Pod 2.5', match.odds.under25)" class="bg-[#0f172a] border border-slate-700 hover:border-blue-500 rounded p-3 text-center transition-colors">
+                                                <div class="text-xs text-slate-400 mb-1">Pod 2.5 Gólov</div>
+                                                <div class="font-bold text-slate-200">{{ match.odds.under25.toFixed(2) }}</div>
+                                            </button>
+                                            <button (click)="placeSpecificBet(match, 'BTTS', 'Áno', match.odds.bttsYes)" class="bg-[#0f172a] border border-slate-700 hover:border-blue-500 rounded p-3 text-center transition-colors">
+                                                <div class="text-xs text-slate-400 mb-1">Oba dajú gól</div>
+                                                <div class="font-bold text-emerald-400">{{ match.odds.bttsYes.toFixed(2) }}</div>
+                                            </button>
+                                            <button (click)="placeSpecificBet(match, 'Polčas', 'Remíza', match.odds.htDraw)" class="bg-[#0f172a] border border-slate-700 hover:border-blue-500 rounded p-3 text-center transition-colors">
+                                                <div class="text-xs text-slate-400 mb-1">Polčas Remíza</div>
+                                                <div class="font-bold text-slate-200">{{ match.odds.htDraw.toFixed(2) }}</div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-4 bg-[#0f172a] border-t border-slate-800">
+                                       <div class="border border-blue-900/30 bg-blue-900/5 p-4 rounded-lg relative overflow-hidden">
+                                          <div class="absolute -top-10 -right-10 w-20 h-20 bg-blue-500/10 blur-2xl rounded-full pointer-events-none"></div>
+                                          <div class="flex gap-4">
+                                              <div class="text-blue-500 pt-1">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M9 2v4"/><path d="M15 2v4"/><path d="M9 14h6"/><path d="M12 11v6"/></svg>
+                                              </div>
+                                              <div class="flex-1">
+                                                  <div class="text-blue-500 font-bold text-xs mb-1 tracking-widest uppercase">Gemini Insight</div>
+                                                  @if (matchAnalysis()[match.id]) {
+                                                      <p class="text-sm text-slate-300 leading-relaxed animate-fade-in whitespace-pre-line font-medium">{{ matchAnalysis()[match.id] }}</p>
+                                                  } @else if (analyzingMatches()[match.id]) {
+                                                      <div class="animate-pulse space-y-2 mt-1">
+                                                          <div class="h-2 bg-slate-800 rounded w-3/4"></div>
+                                                          <div class="h-2 bg-slate-800 rounded w-full"></div>
+                                                          <span class="text-xs text-blue-500/50 italic">Analyzujem dáta...</span>
+                                                      </div>
+                                                  } @else {
+                                                      <button (click)="triggerAutoAnalysis(match)" class="mt-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold py-2 px-4 rounded border border-blue-500/30 transition-colors flex items-center gap-2">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                                                          SPUSTIŤ AI ANALÝZU
+                                                      </button>
+                                                  }
+                                              </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                            }
+                         </div>
+                     }
+                 }
+                 </div>
+             </div>
+          }
+
+          @case ('generator') {
+              <!-- (Generator view preserved) -->
+              <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 animate-fade-in">
+                  <div class="lg:col-span-2 bg-[#0f172a]/90 backdrop-blur-md rounded-xl border border-slate-800 p-6 shadow-xl flex flex-col neon-box-blue">
+                      <div class="flex items-center gap-3 mb-8 pb-4 border-b border-slate-800"><div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-[0_0_10px_rgba(37,99,235,0.5)]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div><div><h2 class="text-lg font-bold text-white tracking-wide font-orbitron neon-text-blue">AI TACTICAL ENGINE</h2><p class="text-xs text-slate-500 font-mono">V2.4.1 // CALIBRATING...</p></div></div>
+                      <div class="flex-1 space-y-8">
+                          <div><label class="block text-xs font-bold text-blue-500 uppercase tracking-widest mb-3">Target Leagues</label><div class="grid grid-cols-2 md:grid-cols-3 gap-3">@for(league of ['PL', 'PD', 'BL1', 'SA', 'L1', 'ERE', 'PPL', 'UCL', 'UEL']; track league) {<button (click)="toggleGeneratorLeague(league)" class="py-3 px-4 rounded border font-bold text-xs transition-all duration-200 flex items-center justify-between group select-none" [class.bg-blue-600/10]="generatorLeagues().includes(league)" [class.border-blue-500]="generatorLeagues().includes(league)" [class.text-blue-400]="generatorLeagues().includes(league)" [class.bg-[#020617]]="!generatorLeagues().includes(league)" [class.border-slate-800]="!generatorLeagues().includes(league)" [class.text-slate-500]="!generatorLeagues().includes(league)"><span>{{ league }}</span><div class="w-2 h-2 rounded-full transition-colors" [class.bg-blue-500]="generatorLeagues().includes(league)" [class.bg-slate-700]="!generatorLeagues().includes(league)"></div></button>}</div></div>
+                          <div><label class="block text-xs font-bold text-blue-500 uppercase tracking-widest mb-3">Risk Tolerance</label><div class="bg-[#020617] p-1 rounded-lg border border-slate-800 flex"><button (click)="setRisk('low')" class="flex-1 py-2 text-xs font-bold rounded-md transition-all select-none" [class.bg-emerald-500]="riskLevel() === 'low'" [class.text-white]="riskLevel() === 'low'" [class.text-slate-500]="riskLevel() !== 'low'">CONSERVATIVE</button><button (click)="setRisk('high')" class="flex-1 py-2 text-xs font-bold rounded-md transition-all select-none" [class.bg-rose-500]="riskLevel() === 'high'" [class.text-white]="riskLevel() === 'high'" [class.text-slate-500]="riskLevel() !== 'high'">AGGRESSIVE</button></div></div>
+                      </div>
+                      <div class="mt-8 pt-6 border-t border-slate-800"><button (click)="generateTicket()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"><span>GENERATE STRATEGY</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg></button></div>
+                  </div>
+                  <div class="lg:col-span-3 bg-[#0f172a] rounded-xl border border-slate-800 p-6 shadow-xl relative overflow-hidden flex flex-col justify-center items-center min-h-[400px]">
+                      @if(generatedTicket().length === 0) {
+                          <div class="text-center opacity-40"><div class="w-24 h-24 border-2 border-dashed border-slate-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin-slow"><div class="w-16 h-16 border-2 border-slate-600 rounded-full"></div></div><h3 class="text-xl font-bold text-slate-300">WAITING FOR INPUT</h3><p class="text-sm text-slate-500 mt-2">Configure parameters and initialize system.</p></div>
+                      } @else {
+                          <div class="w-full h-full flex flex-col animate-slide-up"><div class="flex justify-between items-center mb-6"><div class="text-xs font-bold text-emerald-400 uppercase tracking-widest border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 rounded">Analysis Complete</div><div class="text-xs font-mono text-slate-500">ID: {{ generatedTicket()[0].id }}-XG</div></div><div class="flex-1 bg-[#020617] rounded-lg border border-slate-700 p-4 space-y-2 mb-6 shadow-inner overflow-y-auto">@for(p of generatedTicket(); track p.id) {<div class="flex items-center justify-between p-3 bg-slate-800/50 rounded border border-slate-700/50 hover:border-blue-500/50 transition-colors"><div class="flex-1"><div class="text-white font-bold text-sm">{{ p.home }} <span class="text-slate-500 text-xs mx-1">vs</span> {{ p.away }}</div><div class="flex items-center gap-2 mt-1"><span class="text-[10px] bg-slate-700 text-slate-300 px-1 rounded uppercase">{{ p.marketName }}</span><span class="text-xs font-bold text-blue-400">{{ p.selectionName }}</span></div></div><div class="text-right"><span class="block text-lg font-bold text-white">{{ p.odds.toFixed(2) }}</span></div></div>}</div><div class="bg-slate-800/30 rounded-lg p-4 border border-slate-700"><div class="flex justify-between items-end mb-4"><div><div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Total Odds</div><div class="text-3xl font-bold text-white leading-none">{{ getTotalOdds() | number:'1.2-2' }}</div></div><div class="text-right"><div class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Potential Return</div><div class="text-3xl font-bold text-emerald-400 leading-none">€{{ (currentStake() * getTotalOdds()) | number:'1.2-2' }}</div></div></div><div class="flex gap-3"><div class="relative w-32"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold">€</span><input type="number" [ngModel]="currentStake()" (ngModelChange)="currentStake.set(+$event)" class="w-full bg-[#020617] border border-slate-600 rounded-lg py-3 pl-8 pr-3 text-white font-bold focus:outline-none focus:border-blue-500"></div><button (click)="placeAccumulator()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2"><span>VSAĎIŤ TIKET</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button></div></div></div>
+                      }
+                  </div>
+              </div>
+          }
+
+          @case ('my-bets') {
+            <div class="animate-fade-in space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3 font-orbitron neon-text-blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M2 9V5.2A1.2 1.2 0 0 1 3.2 4h17.6A1.2 1.2 0 0 1 22 5.2V9"/><path d="M2 15v3.8a1.2 1.2 0 0 0 1.2 1.2h17.6a1.2 1.2 0 0 0 1.2-1.2V15"/><rect width="20" height="6" x="2" y="9" rx="2"/></svg>
+                        Moje Tikety
+                    </h2>
+                    <div class="flex gap-4">
+                        <button (click)="checkTicketStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg text-xs font-bold border border-indigo-500/50 shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                            OVERIŤ VÝSLEDKY
+                        </button>
+                        <div class="flex bg-[#1e293b] p-1 rounded-lg border border-slate-700">
+                            <button (click)="setLedgerFilter('ALL')" [class.bg-slate-800]="ledgerFilter() === 'ALL'" class="px-3 py-1 text-xs font-bold rounded transition-colors">VŠETKY</button>
+                            <button (click)="setLedgerFilter('PENDING')" [class.bg-yellow-900/40]="ledgerFilter() === 'PENDING'" class="px-3 py-1 text-xs font-bold rounded transition-colors">OTVORENÉ</button>
+                            <button (click)="setLedgerFilter('WON')" [class.bg-emerald-900/40]="ledgerFilter() === 'WON'" class="px-3 py-1 text-xs font-bold rounded transition-colors">VÝHERNÉ</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-4">
+                    @if (filteredLedger().length === 0) {
+                        <div class="bg-[#0f172a] border border-slate-800 rounded-xl p-12 text-center">
+                            <p class="text-slate-500 italic">Nenašli sa žiadne tikety.</p>
+                        </div>
+                    }
+                    @for (bet of filteredLedger(); track bet.id) {
+                        <div class="bg-[#0f172a] border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all group relative overflow-hidden">
+                            <!-- Status Indicator Bar -->
+                            <div class="absolute left-0 top-0 bottom-0 w-1" 
+                                [class.bg-yellow-500]="bet.status === 'pending'"
+                                [class.bg-emerald-500]="bet.status === 'won'"
+                                [class.bg-rose-500]="bet.status === 'lost'">
+                            </div>
+
+                            <div class="flex flex-col md:flex-row justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="text-[10px] font-mono text-slate-500">{{ bet.timestamp | date:'dd.MM.yyyy HH:mm' }}</span>
+                                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase"
+                                            [class.bg-yellow-500/10]="bet.status === 'pending'" [class.text-yellow-500]="bet.status === 'pending'"
+                                            [class.bg-emerald-500/10]="bet.status === 'won'" [class.text-emerald-500]="bet.status === 'won'"
+                                            [class.bg-rose-500/10]="bet.status === 'lost'" [class.text-rose-500]="bet.status === 'lost'">
+                                            {{ bet.status === 'pending' ? 'OTVORENÝ' : (bet.status === 'won' ? 'VÝHERNÝ' : 'PREHRATÝ') }}
+                                        </span>
+                                    </div>
+                                    <h3 class="text-white font-bold text-lg mb-1">{{ bet.match }}</h3>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700/50">
+                                            Tip: <span class="text-white font-bold">{{ bet.selection }}</span>
+                                        </span>
+                                        <span class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700/50">
+                                            Kurz: <span class="text-white font-bold">{{ bet.odds.toFixed(2) }}</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="flex md:flex-col justify-between md:items-end gap-2 border-t md:border-t-0 border-slate-800 pt-4 md:pt-0">
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Vklad</div>
+                                        <div class="text-white font-mono font-bold">€{{ bet.stake | number:'1.2-2' }}</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
+                                            {{ bet.status === 'pending' ? 'Možná Výhra' : 'Výsledok' }}
+                                        </div>
+                                        <div class="font-mono font-bold text-lg"
+                                            [class.text-yellow-500]="bet.status === 'pending'"
+                                            [class.text-emerald-400]="bet.status === 'won'"
+                                            [class.text-rose-400]="bet.status === 'lost'">
+                                            @if (bet.status === 'won') {
+                                                +€{{ (bet.stake * bet.odds) | number:'1.2-2' }}
+                                            } @else if (bet.status === 'lost') {
+                                                -€{{ bet.stake | number:'1.2-2' }}
+                                            } @else {
+                                                €{{ (bet.stake * bet.odds) | number:'1.2-2' }}
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+          }
+        }
+        
+        <footer class="mt-20 py-8 border-t border-slate-800/50 text-center text-slate-600 text-xs">
+            <div class="max-w-7xl mx-auto px-4">
+                <p class="mb-2 uppercase tracking-widest font-bold opacity-50">Bet PRO AI &copy; 2024</p>
+                <p class="max-w-2xl mx-auto leading-relaxed opacity-70">
+                    Tento nástroj slúži výlučne na <strong>simuláciu a vzdelávacie účely</strong>. 
+                    Všetky zobrazené kurzy, štatistiky a výsledky sú generované pre demonštráciu funkčnosti. 
+                    Aplikácia neumožňuje vklady ani výbery reálnych peňazí. 
+                    Hazardné hry sú určené len pre osoby staršie ako 18 rokov. Hrajte zodpovedne.
+                </p>
+                <div class="mt-4 flex justify-center gap-4 opacity-50">
+                    <button (click)="openLegal('terms')" class="hover:text-blue-400 transition-colors">Podmienky používania</button>
+                    <span>•</span>
+                    <button (click)="openLegal('privacy')" class="hover:text-blue-400 transition-colors">Ochrana súkromia</button>
+                    <span>•</span>
+                    <span>v1.0.0-beta</span>
+                </div>
+            </div>
+        </footer>
+
+      </div>
+    </main>
+
+    <!-- Mobile Nav -->
+    <nav class="md:hidden fixed bottom-0 w-full bg-[#0f172a]/90 backdrop-blur-md border-t border-slate-800 flex justify-around p-2 z-30 pb-safe shadow-[0_-5px_10px_rgba(0,0,0,0.3)] neon-box-blue">
+      <button (click)="setView('dashboard')" class="flex flex-col items-center p-3 rounded-lg transition-colors" [class.text-blue-500]="currentView() === 'dashboard'" [class.neon-text-blue]="currentView() === 'dashboard'" [class.text-slate-500]="currentView() !== 'dashboard'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></button>
+      <button (click)="setView('ticket-dna')" class="flex flex-col items-center p-3 rounded-lg transition-colors" [class.text-blue-500]="currentView() === 'ticket-dna'" [class.neon-text-blue]="currentView() === 'ticket-dna'" [class.text-slate-500]="currentView() !== 'ticket-dna'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3.3-1.12.8-2.22 1.5-3.2.5 2.5 2 4.9 4 6.5z"/></svg></button>
+      <button (click)="setView('my-bets')" class="flex flex-col items-center p-3 rounded-lg transition-colors relative" [class.text-blue-500]="currentView() === 'my-bets'" [class.neon-text-blue]="currentView() === 'my-bets'" [class.text-slate-500]="currentView() !== 'my-bets'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V5.2A1.2 1.2 0 0 1 3.2 4h17.6A1.2 1.2 0 0 1 22 5.2V9"/><path d="M2 15v3.8a1.2 1.2 0 0 0 1.2 1.2h17.6a1.2 1.2 0 0 0 1.2-1.2V15"/><rect width="20" height="6" x="2" y="9" rx="2"/></svg>
+        @if (bankroll.activeBets().length > 0) {
+          <span class="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full animate-ping"></span>
+        }
+      </button>
+      <button (click)="setView('generator')" class="flex flex-col items-center p-3 rounded-lg transition-colors" [class.text-blue-500]="currentView() === 'generator'" [class.neon-text-blue]="currentView() === 'generator'" [class.text-slate-500]="currentView() !== 'generator'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg></button>
+      <button (click)="setView('analysis')" class="flex flex-col items-center p-3 rounded-lg transition-colors" [class.text-blue-500]="currentView() === 'analysis'" [class.neon-text-blue]="currentView() === 'analysis'" [class.text-slate-500]="currentView() !== 'analysis'"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></button>
+    </nav>
+    
+    <!-- ADVANCED BET CONFIRMATION MODAL -->
+    @if (showBetModal() && pendingBet()) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in">
+        <div class="bg-[#0f172a] border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl transform transition-all scale-100 relative overflow-hidden flex flex-col max-h-[90vh] neon-box-blue">
+            <!-- Decoration -->
+            <div class="absolute top-0 w-full h-1 bg-gradient-to-r from-blue-600 via-emerald-400 to-blue-600"></div>
+
+            <div class="p-6 overflow-y-auto">
+                <div class="flex items-center gap-2 mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <h3 class="text-xl font-bold text-white font-orbitron neon-text-blue">Konfigurácia Stávky</h3>
+                </div>
+                
+                <!-- Match Summary -->
+                <div class="bg-[#020617] rounded-xl p-4 border border-slate-800 mb-6 shadow-inner">
+                    <div class="flex justify-between items-start mb-2">
+                         <span class="text-white font-bold text-sm">{{ pendingBet()?.description }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-emerald-400 font-bold bg-emerald-400/10 px-2 py-0.5 rounded text-sm border border-emerald-400/20">{{ pendingBet()?.selection }}</span>
+                        <span class="text-yellow-400 font-bold text-lg bg-yellow-400/10 px-2 py-0.5 rounded border border-yellow-400/20">{{ pendingBet()?.odds | number:'1.2-2' }}</span>
+                    </div>
+                    @if (pendingBet()?.details) {
+                        <div class="mt-3 pt-3 border-t border-slate-800/50 space-y-1">
+                            @for (detail of pendingBet()?.details; track $index) {
+                                <div class="text-[10px] text-slate-500 truncate">{{ detail }}</div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Kelly Criterion Calculator -->
+                <div class="mb-6 bg-slate-800/20 p-4 rounded-xl border border-slate-700/50">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1">
+                            Inteligentný Výpočet Vkladu
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h8"/></svg>
+                        </h4>
+                        <span class="text-[10px] text-slate-500">(Kellyho Kritérium)</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Úroveň Dôvery</span>
+                                <span class="text-white font-bold">{{ pendingBet()?.confidence }}%</span>
+                            </div>
+                            <input 
+                                type="range" 
+                                min="1" max="99" 
+                                [ngModel]="pendingBet()?.confidence" 
+                                (ngModelChange)="updateConfidence($event)"
+                                class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                            >
+                        </div>
+                        <button (click)="applyKelly()" class="w-full py-2 bg-slate-700 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:border-blue-500 rounded text-xs font-bold transition-all flex items-center justify-center gap-2">
+                            OPTIMALIZOVAŤ VKLAD
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stake Input -->
+                <div class="flex justify-between items-end mb-6 bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                    <div class="w-1/2">
+                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Suma Vkladu</div>
+                        <div class="flex items-center">
+                            <span class="text-slate-500 text-xl mr-1">€</span>
+                            <input 
+                                type="number" 
+                                [ngModel]="pendingBet()?.stake" 
+                                (ngModelChange)="updateStake($event)"
+                                class="bg-transparent text-white font-bold text-2xl w-full focus:outline-none"
+                            >
+                        </div>
+                    </div>
+                    <div class="text-right w-1/2">
+                        <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Možná Výhra</div>
+                        <div class="text-emerald-400 font-bold text-2xl neon-text-emerald">€{{ pendingBet()?.return | number:'1.2-2' }}</div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button 
+                        (click)="cancelBet()" 
+                        [disabled]="isProcessingBet()"
+                        class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3.5 rounded-lg transition-colors border border-slate-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        ZRUŠIŤ
+                    </button>
+                    <button 
+                        (click)="confirmBet()" 
+                        [disabled]="isProcessingBet()"
+                        [class.bg-emerald-600]="betSuccess()"
+                        [class.bg-blue-600]="!betSuccess()"
+                        [class.neon-box-blue]="!betSuccess()"
+                        class="relative overflow-hidden hover:opacity-90 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-blue-900/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm disabled:cursor-not-allowed"
+                    >
+                        @if (betSuccess()) {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-bounce"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>HOTOVO</span>
+                        } @else if (isProcessingBet()) {
+                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>SPRACOVÁVAM...</span>
+                        } @else {
+                            <span>VSAĎIŤ</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+      </div>
+    }
+
+<!-- SETTINGS MODAL -->
+@if (showSettingsModal()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeSettings()"></div>
+        <div class="relative bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white font-orbitron">Nastavenia</h3>
+                <button (click)="closeSettings()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <h4 class="text-sm font-bold text-white mb-2">Simulácia</h4>
+                    <p class="text-xs text-slate-400 mb-4">Resetuje všetky stávky, históriu a vráti kapitál na počiatočnú hodnotu.</p>
+                    <button (click)="resetSimulation()" class="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold py-2 rounded-lg transition-colors text-xs uppercase tracking-wider">
+                        Resetovať Simuláciu
+                    </button>
+                </div>
+
+                <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <h4 class="text-sm font-bold text-white mb-2">Licencia</h4>
+                    <p class="text-xs text-slate-400 mb-4">Odhlásiť sa a odstrániť licenčný kľúč zo zariadenia.</p>
+                    <button (click)="logout()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-colors text-xs uppercase tracking-wider">
+                        Odhlásiť sa
+                    </button>
+                </div>
+                
+                <div class="text-center pt-4 border-t border-slate-800 space-y-2">
+                    <p class="text-[10px] text-slate-600">Verzia 2.4.1 (Build 2026.02)</p>
+                    <a href="/DISCLAIMER.md" target="_blank" class="text-[10px] text-blue-500 hover:underline block">Zrieknutie sa zodpovednosti (Disclaimer)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+    <!-- TOAST NOTIFICATION -->
+    @if (showToast()) {
+      <div class="fixed top-6 right-6 z-[100] animate-slide-in-right">
+        <div 
+          [class.bg-emerald-600]="toastType() === 'success'"
+          [class.bg-rose-600]="toastType() === 'error'"
+          [class.neon-box-blue]="true"
+          class="flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border border-white/10 text-white min-w-[300px]"
+        >
+          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            @if (toastType() === 'success') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+            }
+          </div>
+          <div>
+            <div class="font-bold text-sm">{{ toastType() === 'success' ? 'SYSTÉM' : 'CHYBA' }}</div>
+            <div class="text-xs opacity-90">{{ toastMessage() }}</div>
+          </div>
+        </div>
+      </div>
+    }
+
+
+
+    <!-- AGE GATE MODAL -->
+    @if (showAgeGate()) {
+        <div class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+                
+                <div class="mb-6 flex justify-center">
+                    <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                        <span class="text-2xl font-bold text-white">18+</span>
+                    </div>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-white mb-4 font-orbitron">Vekové obmedzenie</h2>
+                <p class="text-slate-400 mb-8 leading-relaxed">
+                    Táto aplikácia je určená výlučne pre osoby staršie ako 18 rokov. 
+                    Obsahuje simulácie hazardných hier.
+                </p>
+                
+                <button (click)="acceptAgeGate()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-900/20 mb-4">
+                    MÁM VIAC AKO 18 ROKOV
+                </button>
+                
+                <div class="text-xs text-slate-600">
+                    Vstupom potvrdzujete súhlas s <button (click)="openLegal('terms')" class="text-blue-500 hover:underline">Podmienkami</button>.
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- LEGAL MODAL -->
+    @if (showLegalModal()) {
+        <div class="fixed inset-0 z-[210] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl">
+                <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                    <h3 class="text-xl font-bold text-white font-orbitron">
+                        {{ showLegalModal() === 'terms' ? 'Podmienky používania' : 'Ochrana súkromia' }}
+                    </h3>
+                    <button (click)="closeLegal()" class="text-slate-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                    </button>
+                </div>
+                
+                <div class="p-8 overflow-y-auto text-slate-300 text-sm leading-relaxed space-y-4">
+                    @if (showLegalModal() === 'terms') {
+                        <p><strong>1. Úvod</strong><br>Vitajte v aplikácii Bet PRO AI. Táto aplikácia slúži výlučne na vzdelávacie a simulačné účely.</p>
+                        <p><strong>2. Žiadne reálne peniaze</strong><br>Aplikácia neumožňuje vklady, stávky ani výbery reálnych peňazí. Všetky "prostriedky" sú virtuálne body bez peňažnej hodnoty.</p>
+                        <p><strong>3. Vylúčenie zodpovednosti</strong><br>Autori nenesú zodpovednosť za akékoľvek finančné straty spôsobené používaním informácií z tejto aplikácie pri reálnom stávkovaní.</p>
+                        <p><strong>4. Vekové obmedzenie</strong><br>Aplikácia je určená len pre osoby staršie ako 18 rokov.</p>
+                    } @else {
+                        <p><strong>1. Zber dát</strong><br>Aplikácia ukladá vaše nastavenia a históriu simulovaných stávok lokálne vo vašom prehliadači (LocalStorage).</p>
+                        <p><strong>2. Cookies</strong><br>Používame len technické cookies nevyhnutné pre fungovanie aplikácie.</p>
+                        <p><strong>3. Tretie strany</strong><br>Pre analýzu zápasov využívame AI služby, ktorým sú odosielané len anonymizované dáta o zápasoch, nie o používateľoch.</p>
+                    }
+                </div>
+                
+                <div class="p-6 border-t border-slate-800 bg-slate-900/50 flex justify-end">
+                    <button (click)="closeLegal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                        ZAVRIEŤ
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+}
