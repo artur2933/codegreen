@@ -128,6 +128,9 @@ export class AppComponent {
         // Fetch matches from Sports API
         await this.dataService.loadMatchesFromApi([...this.leagues]);
         
+        // Generate AI Ticket based on loaded matches
+        await this.generateAITicket();
+        
         this.triggerToast('Live dáta úspešne načítané (Sports API)', 'success');
     } catch (e) {
         console.error("Failed to load dynamic matches", e);
@@ -136,6 +139,42 @@ export class AppComponent {
     } finally {
         this.isLoadingMatches.set(false);
     }
+  }
+
+  async generateAITicket() {
+      const matches = this.dataService.getMatches('ALL');
+      if (matches.length === 0) return;
+
+      try {
+          // Default to 'low' risk for the daily ticket
+          const aiPredictions = await this.gemini.generateDailyMatches('ALL', 'low', matches);
+          
+          if (aiPredictions && aiPredictions.length > 0) {
+              const mappedPredictions: Prediction[] = aiPredictions.map(p => {
+                  const match = matches.find(m => m.id === p.matchId);
+                  return {
+                      id: Math.random().toString(36).substr(2, 5),
+                      matchId: p.matchId,
+                      home: match ? match.home : 'Unknown',
+                      away: match ? match.away : 'Unknown',
+                      marketName: p.marketName || 'Víťaz',
+                      selectionName: p.selectionName || '1',
+                      odds: p.odds || 1.5,
+                      reasoning: p.reasoning
+                  };
+              });
+              this.dailyTicketPredictions.set(mappedPredictions);
+          } else {
+              // Fallback if AI fails
+              this.dailyTicketPredictions.set(this.dataService.getDailyTicketPredictions());
+          }
+      } catch (e: any) {
+          console.error("AI Ticket generation failed, using fallback", e);
+          if (e.message && (e.message.includes('limit') || e.message.includes('licencia'))) {
+              this.triggerToast(e.message, "error");
+          }
+          this.dailyTicketPredictions.set(this.dataService.getDailyTicketPredictions());
+      }
   }
 
   // UI State
@@ -205,7 +244,6 @@ export class AppComponent {
         }
     });
 
-    this.dailyTicketPredictions.set(this.dataService.getDailyTicketPredictions());
     this.updateTitle();
     
     effect(() => {
@@ -522,26 +560,49 @@ export class AppComponent {
     });
   }
 
-  generateTicket() {
+  async generateTicket() {
     if (this.generatorLeagues().length === 0) {
-      alert("Vyberte aspoň jednu ligu!");
+      this.triggerToast("Vyberte aspoň jednu ligu!", "error");
       return;
     }
-    const pool = this.dataService.generatePredictions(this.riskLevel(), this.generatorLeagues());
-    if (pool.length === 0) {
-        alert("Nenašli sa zápasy pre toto riziko vo vybraných ligách.");
+    
+    // Get all matches for selected leagues
+    let matches = this.dataService.getMatches('ALL');
+    matches = matches.filter(m => this.generatorLeagues().includes(m.league));
+    
+    if (matches.length === 0) {
+        this.triggerToast("Nenašli sa zápasy vo vybraných ligách.", "error");
         return;
     }
-    const shuffled = pool.sort(() => 0.5 - Math.random());
-    const selected: Prediction[] = [];
-    const usedMatches = new Set<string>();
-    for (const p of shuffled) {
-        if (!usedMatches.has(p.matchId) && selected.length < 3) {
-            selected.push(p);
-            usedMatches.add(p.matchId);
+
+    this.triggerToast("AI analyzuje zápasy...", "success");
+    
+    try {
+        const aiPredictions = await this.gemini.generateDailyMatches('ALL', this.riskLevel(), matches);
+        
+        if (aiPredictions && aiPredictions.length > 0) {
+            const mappedPredictions: Prediction[] = aiPredictions.map(p => {
+                const match = matches.find(m => m.id === p.matchId);
+                return {
+                    id: Math.random().toString(36).substr(2, 5),
+                    matchId: p.matchId,
+                    home: match ? match.home : 'Unknown',
+                    away: match ? match.away : 'Unknown',
+                    marketName: p.marketName || 'Víťaz',
+                    selectionName: p.selectionName || '1',
+                    odds: p.odds || 1.5,
+                    reasoning: p.reasoning
+                };
+            });
+            this.generatedTicket.set(mappedPredictions);
+            this.triggerToast("Tiket bol vygenerovaný", "success");
+        } else {
+            this.triggerToast("Generovanie zlyhalo, skúste znova.", "error");
         }
+    } catch (e: any) {
+        console.error("AI Ticket generation failed", e);
+        this.triggerToast(e.message || "Generovanie zlyhalo, skúste znova.", "error");
     }
-    this.generatedTicket.set(selected);
   }
 
   // --- BETTING SYSTEM ---

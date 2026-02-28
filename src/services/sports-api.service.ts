@@ -33,7 +33,7 @@ export class SportsApiService {
       const data = await response.json();
       
       // If backend says "mock: true" or returns empty, use local mock
-      if (data.mock || !Array.isArray(data.response)) {
+      if (data.mock || !Array.isArray(data.response) || data.response.length === 0 || (data.errors && Object.keys(data.errors).length > 0)) {
           return this.getMockMatches(leagueCode);
       }
 

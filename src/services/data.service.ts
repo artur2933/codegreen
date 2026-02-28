@@ -60,6 +60,7 @@ export interface Prediction {
   marketName: string;
   selectionName: string;
   odds: number;
+  reasoning?: string;
 }
 
 @Injectable({

@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx server.ts",
+    "start": "node server.ts",
     "build": "ng build",
     "lint": "ng lint",
-    "preview": "ng serve --configuration=production"
+    "preview": "node server.ts"
   },
   "dependencies": {
     "@angular/build": "^21.1.0",
@@ -19,6 +19,10 @@
     "@angular/forms": "^21.1.4",
     "@angular/platform-browser": "^21.1.0",
     "@google/genai": "^1.41.0",
+    "@sentry/angular": "^10.40.0",
+    "@sentry/node": "^10.40.0",
+    "@sentry/profiling-node": "^10.40.0",
+    "@vercel/kv": "^3.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",

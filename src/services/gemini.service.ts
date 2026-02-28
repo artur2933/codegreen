@@ -37,7 +37,7 @@ export class GeminiService {
     }
   }
 
-  async generateDailyMatches(league: string): Promise<any[]> {
+  async generateDailyMatches(league: string, risk: 'low' | 'high', matches: Match[]): Promise<any[]> {
     try {
       const response = await fetch('/api/generate-ticket', {
         method: 'POST',
@@ -45,14 +45,28 @@ export class GeminiService {
             'Content-Type': 'application/json',
             'x-license-key': this.licenseService.licenseKey()
         },
-        body: JSON.stringify({ league })
+        body: JSON.stringify({ league, risk, matches })
       });
 
-      if (!response.ok) throw new Error('Failed to generate ticket');
+      if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          
+          if (response.status === 429) {
+              throw new Error(errorData.error || 'Denný limit vyčerpaný (5/5 tiketov). Skúste to znova zajtra.');
+          }
+          if (response.status === 403) {
+              throw new Error(errorData.error || 'Neplatná alebo expirovaná licencia.');
+          }
+          if (response.status === 503) {
+              console.warn('AI Service Unavailable (Invalid API Key or Overloaded). Using fallback.');
+              return [];
+          }
+          throw new Error('Nepodarilo sa vygenerovať tiket.');
+      }
       return await response.json();
     } catch (error) {
       console.error('Gemini Match Generation Error:', error);
-      return [];
+      throw error; // Rethrow so the component can show it to the user
     }
   }
 
@@ -72,6 +86,9 @@ export class GeminiService {
       });
 
       if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          if (response.status === 429) return errorData.error || "Denný limit vyčerpaný (5/5 tiketov).";
+          if (response.status === 403) return errorData.error || "Neplatná alebo expirovaná licencia.";
           if (response.status === 503) return "AI Service Unavailable (Check API Key)";
           throw new Error('Analysis failed');
       }
