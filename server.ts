@@ -7,6 +7,19 @@ import 'dotenv/config';
 import NodeCache from 'node-cache';
 import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import { createClient } from '@vercel/kv';
+
+let kv: any = null;
+if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    try {
+        kv = createClient({
+            url: process.env.KV_REST_API_URL,
+            token: process.env.KV_REST_API_TOKEN,
+        });
+    } catch (e) {
+        console.warn('Failed to initialize Vercel KV', e);
+    }
+}
 
 // Initialize Sentry for Error Tracking & Performance Monitoring
 Sentry.init({
@@ -50,8 +63,6 @@ const apiLimiter = async (req: express.Request, res: express.Response, next: exp
     }
     next();
 };
-
-import { kv } from '@vercel/kv';
 
 // 2. Caching (Save API Costs & Speed Up)
 const localCache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour by default
@@ -507,6 +518,11 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
+// Catch-all for unhandled API routes
+app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'API route not found or timed out' });
+});
+
 // Fallback to Index
 app.use((req, res) => {
     const indexPath = path.join(__dirname, 'dist', 'index.html');
@@ -522,10 +538,8 @@ app.use((req, res) => {
 // The error handler must be registered before any other error middleware and after all controllers
 Sentry.setupExpressErrorHandler(app);
 
-if (!process.env.VERCEL) {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
-}
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
 export default app;
